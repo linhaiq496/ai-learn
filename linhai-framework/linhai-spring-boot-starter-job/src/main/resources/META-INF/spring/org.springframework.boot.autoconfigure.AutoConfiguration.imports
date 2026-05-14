@@ -1,0 +1,2 @@
+cn.iocoder.linhai.framework.quartz.config.LinhaiQuartzAutoConfiguration
+cn.iocoder.linhai.framework.quartz.config.LinhaiAsyncAutoConfiguration

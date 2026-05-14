@@ -1,0 +1,7 @@
+cn.iocoder.linhai.framework.apilog.config.LinhaiApiLogAutoConfiguration
+cn.iocoder.linhai.framework.jackson.config.LinhaiJacksonAutoConfiguration
+cn.iocoder.linhai.framework.swagger.config.LinhaiSwaggerAutoConfiguration
+cn.iocoder.linhai.framework.web.config.LinhaiWebAutoConfiguration
+cn.iocoder.linhai.framework.xss.config.LinhaiXssAutoConfiguration
+cn.iocoder.linhai.framework.banner.config.LinhaiBannerAutoConfiguration
+cn.iocoder.linhai.framework.encrypt.config.LinhaiApiEncryptAutoConfiguration

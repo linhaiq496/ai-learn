@@ -1,0 +1,31 @@
+@font-face {
+  font-family: 'PingFang SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('PingFang SC'),
+    url('@/assets/fonts/PingFangSC-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'PingFang SC';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    local('PingFang SC'),
+    url('@/assets/fonts/PingFangSC-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'PingFang SC';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src:
+    local('PingFang SC Semibold'),
+    local('PingFang SC'),
+    url('@/assets/fonts/PingFangSC-Semibold.woff2') format('woff2');
+}
+

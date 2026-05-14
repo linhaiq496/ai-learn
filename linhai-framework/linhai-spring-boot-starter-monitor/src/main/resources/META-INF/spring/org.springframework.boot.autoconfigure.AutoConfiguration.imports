@@ -1,0 +1,2 @@
+cn.iocoder.linhai.framework.tracer.config.LinhaiTracerAutoConfiguration
+cn.iocoder.linhai.framework.tracer.config.LinhaiMetricsAutoConfiguration

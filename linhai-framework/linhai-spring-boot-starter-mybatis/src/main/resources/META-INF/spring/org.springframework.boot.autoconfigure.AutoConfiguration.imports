@@ -1,0 +1,3 @@
+cn.iocoder.linhai.framework.datasource.config.LinhaiDataSourceAutoConfiguration
+cn.iocoder.linhai.framework.mybatis.config.LinhaiMybatisAutoConfiguration
+cn.iocoder.linhai.framework.translate.config.LinhaiTranslateAutoConfiguration

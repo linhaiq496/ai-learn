@@ -1,0 +1,3 @@
+cn.iocoder.linhai.framework.mq.redis.config.LinhaiRedisMQProducerAutoConfiguration
+cn.iocoder.linhai.framework.mq.redis.config.LinhaiRedisMQConsumerAutoConfiguration
+cn.iocoder.linhai.framework.mq.rabbitmq.config.LinhaiRabbitMQAutoConfiguration

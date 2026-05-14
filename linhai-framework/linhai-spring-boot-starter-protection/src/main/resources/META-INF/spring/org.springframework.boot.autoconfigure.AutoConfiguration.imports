@@ -1,0 +1,4 @@
+cn.iocoder.linhai.framework.idempotent.config.LinhaiIdempotentConfiguration
+cn.iocoder.linhai.framework.lock4j.config.LinhaiLock4jConfiguration
+cn.iocoder.linhai.framework.ratelimiter.config.LinhaiRateLimiterConfiguration
+cn.iocoder.linhai.framework.signature.config.LinhaiApiSignatureAutoConfiguration

@@ -1,0 +1,2 @@
+cn.iocoder.linhai.framework.redis.config.LinhaiRedisAutoConfiguration
+cn.iocoder.linhai.framework.redis.config.LinhaiCacheAutoConfiguration

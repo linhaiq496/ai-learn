@@ -1,0 +1,3 @@
+cn.iocoder.linhai.framework.security.config.LinhaiSecurityAutoConfiguration
+cn.iocoder.linhai.framework.security.config.LinhaiWebSecurityConfigurerAdapter
+cn.iocoder.linhai.framework.operatelog.config.LinhaiOperateLogConfiguration
