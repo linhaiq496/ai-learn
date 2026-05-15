@@ -1,293 +1,287 @@
--- AI Learning OS schema
--- This script is kept separate from ruoyi-vue-pro.sql so it can be reviewed
--- and merged into the main initializer or a Flyway/Liquibase migration later.
+-- AI 学习系统表结构
+-- 当前脚本独立于 ruoyi-vue-pro.sql，便于后续评审后合并到主初始化脚本
+-- 或迁移到 Flyway / Liquibase 中统一管理。
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for ai_learning_plan
+-- 表结构：ai_learning_plan
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_plan`;
 CREATE TABLE `ai_learning_plan` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Plan ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Plan title',
-  `goal` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Learning goal',
-  `goal_prompt` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Extra planning prompt',
-  `source_summary` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'AI summary of source materials',
-  `cycle_days` int NOT NULL DEFAULT 0 COMMENT 'Learning cycle in days',
-  `daily_study_minutes` int NOT NULL DEFAULT 0 COMMENT 'Daily study minutes',
-  `total_study_minutes` int NOT NULL DEFAULT 0 COMMENT 'Total planned study minutes',
-  `plan_status` tinyint NOT NULL DEFAULT 0 COMMENT 'Plan status, enum: AiLearningPlanStatusEnum',
-  `current_phase_id` bigint NULL DEFAULT NULL COMMENT 'Current active phase ID',
-  `overall_progress` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Overall progress percent',
-  `overall_mastery` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Overall mastery percent',
-  `latest_score` decimal(5,2) NULL DEFAULT NULL COMMENT 'Latest exam score',
-  `average_score` decimal(5,2) NULL DEFAULT NULL COMMENT 'Average exam score',
-  `highest_score` decimal(5,2) NULL DEFAULT NULL COMMENT 'Highest exam score',
-  `plan_generated_time` datetime NULL DEFAULT NULL COMMENT 'Plan generated time',
-  `last_studied_time` datetime NULL DEFAULT NULL COMMENT 'Last studied time',
-  `next_review_time` datetime NULL DEFAULT NULL COMMENT 'Next review time',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '学习计划编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '计划标题',
+  `goal` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '学习目标',
+  `goal_prompt` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '补充规划提示词',
+  `source_summary` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'AI 生成的资料总结',
+  `cycle_days` int NOT NULL DEFAULT 0 COMMENT '学习周期天数',
+  `daily_study_minutes` int NOT NULL DEFAULT 0 COMMENT '每日学习时长（分钟）',
+  `total_study_minutes` int NOT NULL DEFAULT 0 COMMENT '计划总学习时长（分钟）',
+  `plan_status` tinyint NOT NULL DEFAULT 0 COMMENT '计划状态，见 AiLearningPlanStatusEnum',
+  `current_phase_id` bigint NULL DEFAULT NULL COMMENT '当前进行中的阶段编号',
+  `total_phase_count` int NOT NULL DEFAULT 0 COMMENT '总阶段数量',
+  `overall_mastery` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '整体掌握度（百分比）',
+  `latest_score` decimal(5,2) NULL DEFAULT NULL COMMENT '最近一次考试得分',
+  `average_score` decimal(5,2) NULL DEFAULT NULL COMMENT '考试平均分',
+  `highest_score` decimal(5,2) NULL DEFAULT NULL COMMENT '历史最高分',
+  `last_studied_time` datetime NULL DEFAULT NULL COMMENT '最近学习时间',
+  `next_review_time` datetime NULL DEFAULT NULL COMMENT '下次复习时间',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_ai_learning_plan_user_status` (`user_id`, `plan_status`) USING BTREE,
   KEY `idx_ai_learning_plan_current_phase_id` (`current_phase_id`) USING BTREE,
   KEY `idx_ai_learning_plan_next_review_time` (`next_review_time`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning plan';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 学习计划表';
 
 -- ----------------------------
--- Table structure for ai_learning_material
--- ----------------------------
-DROP TABLE IF EXISTS `ai_learning_material`;
-CREATE TABLE `ai_learning_material` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Material ID',
-  `plan_id` bigint NOT NULL COMMENT 'Plan ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `knowledge_id` bigint NULL DEFAULT NULL COMMENT 'Linked ai_knowledge ID',
-  `knowledge_document_id` bigint NULL DEFAULT NULL COMMENT 'Linked ai_knowledge_document ID',
-  `file_id` bigint NULL DEFAULT NULL COMMENT 'Linked infra file ID',
-  `material_type` tinyint NOT NULL DEFAULT 0 COMMENT 'Material type, enum: AiLearningMaterialTypeEnum',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Material name',
-  `storage_path` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Storage path or URL',
-  `content_hash` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Content hash',
-  `original_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Original pasted text',
-  `parsed_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Parsed material text',
-  `parse_status` tinyint NOT NULL DEFAULT 0 COMMENT 'Parse status, enum: AiLearningMaterialParseStatusEnum',
-  `error_message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Parse error message',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
-  PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_ai_learning_material_plan_id` (`plan_id`) USING BTREE,
-  KEY `idx_ai_learning_material_document_id` (`knowledge_document_id`) USING BTREE,
-  KEY `idx_ai_learning_material_parse_status` (`parse_status`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning source material';
-
--- ----------------------------
--- Table structure for ai_learning_phase
+-- 表结构：ai_learning_phase
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_phase`;
 CREATE TABLE `ai_learning_phase` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Phase ID',
-  `plan_id` bigint NOT NULL COMMENT 'Plan ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `phase_index` int NOT NULL DEFAULT 1 COMMENT 'Phase index starting from 1',
-  `phase_title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Phase title',
-  `phase_goal` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Phase goal',
-  `phase_summary` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Phase summary',
-  `mastery_targets` json NULL COMMENT 'Target mastery indicators JSON',
-  `expected_days` int NOT NULL DEFAULT 0 COMMENT 'Expected days',
-  `expected_minutes` int NOT NULL DEFAULT 0 COMMENT 'Expected study minutes',
-  `sort` int NOT NULL DEFAULT 0 COMMENT 'Display sort',
-  `phase_status` tinyint NOT NULL DEFAULT 0 COMMENT 'Phase status, enum: AiLearningPhaseStatusEnum',
-  `start_time` datetime NULL DEFAULT NULL COMMENT 'Phase actual start time',
-  `end_time` datetime NULL DEFAULT NULL COMMENT 'Phase actual end time',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '学习阶段编号',
+  `plan_id` bigint NOT NULL COMMENT '学习计划编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `phase_index` int NOT NULL DEFAULT 1 COMMENT '阶段序号，从 1 开始',
+  `phase_title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '阶段标题',
+  `phase_goal` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '阶段目标',
+  `phase_summary` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '阶段学习说明',
+  `mastery_targets` json NULL COMMENT '阶段掌握指标 JSON',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '展示排序',
+  `phase_status` tinyint NOT NULL DEFAULT 0 COMMENT '阶段状态，见 AiLearningPhaseStatusEnum',
+  `start_time` datetime NULL DEFAULT NULL COMMENT '阶段实际开始时间',
+  `end_time` datetime NULL DEFAULT NULL COMMENT '阶段实际结束时间',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_ai_learning_phase_plan_phase_index` (`plan_id`, `phase_index`) USING BTREE,
   KEY `idx_ai_learning_phase_plan_status` (`plan_id`, `phase_status`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning phase';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 学习阶段表';
 
 -- ----------------------------
--- Table structure for ai_learning_task
+-- 表结构：ai_learning_material
+-- ----------------------------
+DROP TABLE IF EXISTS `ai_learning_material`;
+CREATE TABLE `ai_learning_material` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '学习资料编号',
+  `phase_id` bigint NOT NULL COMMENT '学习阶段编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `knowledge_id` bigint NULL DEFAULT NULL COMMENT '关联的 ai_knowledge 编号',
+  `knowledge_document_id` bigint NULL DEFAULT NULL COMMENT '关联的 ai_knowledge_document 编号',
+  `file_id` bigint NULL DEFAULT NULL COMMENT '关联的 infra 文件编号',
+  `material_type` tinyint NOT NULL DEFAULT 0 COMMENT '资料类型，见 AiLearningMaterialTypeEnum',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '资料名称',
+  `storage_path` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '存储路径或外部链接',
+  `content_hash` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '内容哈希值',
+  `original_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '原始输入内容',
+  `parsed_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '解析后的资料内容',
+  `sort` int NOT NULL DEFAULT 0 COMMENT '资料排序',
+  `parse_status` tinyint NOT NULL DEFAULT 0 COMMENT '解析状态，见 AiLearningMaterialParseStatusEnum',
+  `error_message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '解析错误信息',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_ai_learning_material_phase_id` (`phase_id`) USING BTREE,
+  KEY `idx_ai_learning_material_document_id` (`knowledge_document_id`) USING BTREE,
+  KEY `idx_ai_learning_material_parse_status` (`parse_status`) USING BTREE
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 阶段学习资料表';
+
+-- ----------------------------
+-- 表结构：ai_learning_task
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_task`;
 CREATE TABLE `ai_learning_task` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Task ID',
-  `plan_id` bigint NOT NULL COMMENT 'Plan ID',
-  `phase_id` bigint NULL DEFAULT NULL COMMENT 'Phase ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `task_date` date NOT NULL COMMENT 'Task date',
-  `start_time` datetime NULL DEFAULT NULL COMMENT 'Scheduled start time',
-  `end_time` datetime NULL DEFAULT NULL COMMENT 'Scheduled end time',
-  `title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Task title',
-  `task_type` tinyint NOT NULL DEFAULT 0 COMMENT 'Task type, enum: AiLearningTaskTypeEnum',
-  `task_mode` tinyint NOT NULL DEFAULT 0 COMMENT 'Task mode, enum: AiLearningTaskModeEnum',
-  `task_status` tinyint NOT NULL DEFAULT 0 COMMENT 'Task status, enum: AiLearningTaskStatusEnum',
-  `content_outline` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Task outline',
-  `learning_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Generated learning content',
-  `todo_question_count` int NOT NULL DEFAULT 0 COMMENT 'Planned question count',
-  `completion_rate` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Completion rate percent',
-  `mastery_before` decimal(5,2) NULL DEFAULT NULL COMMENT 'Mastery before task',
-  `mastery_after` decimal(5,2) NULL DEFAULT NULL COMMENT 'Mastery after task',
-  `actual_study_minutes` int NOT NULL DEFAULT 0 COMMENT 'Actual study minutes',
-  `exam_id` bigint NULL DEFAULT NULL COMMENT 'Linked exam ID',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '学习任务编号',
+  `plan_id` bigint NOT NULL COMMENT '学习计划编号',
+  `phase_id` bigint NOT NULL COMMENT '学习阶段编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `task_date` date NOT NULL COMMENT '任务日期',
+  `start_time` datetime NULL DEFAULT NULL COMMENT '计划开始时间',
+  `end_time` datetime NULL DEFAULT NULL COMMENT '计划结束时间',
+  `title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '任务标题',
+  `task_type` tinyint NOT NULL DEFAULT 0 COMMENT '任务类型，见 AiLearningTaskTypeEnum',
+  `task_mode` tinyint NOT NULL DEFAULT 0 COMMENT '任务模式，见 AiLearningTaskModeEnum',
+  `task_status` tinyint NOT NULL DEFAULT 0 COMMENT '任务状态，见 AiLearningTaskStatusEnum',
+  `content_outline` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '任务学习大纲',
+  `completion_rate` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '任务完成率（百分比）',
+  `actual_study_minutes` int NOT NULL DEFAULT 0 COMMENT '实际学习时长（分钟）',
+  `exam_id` bigint NULL DEFAULT NULL COMMENT '关联考试编号',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_ai_learning_task_user_date_status` (`user_id`, `task_date`, `task_status`) USING BTREE,
   KEY `idx_ai_learning_task_plan_phase` (`plan_id`, `phase_id`) USING BTREE,
   KEY `idx_ai_learning_task_exam_id` (`exam_id`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning task';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 学习任务表';
 
 -- ----------------------------
--- Table structure for ai_learning_exam
+-- 表结构：ai_learning_exam
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_exam`;
 CREATE TABLE `ai_learning_exam` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Exam ID',
-  `plan_id` bigint NOT NULL COMMENT 'Plan ID',
-  `phase_id` bigint NULL DEFAULT NULL COMMENT 'Phase ID',
-  `task_id` bigint NULL DEFAULT NULL COMMENT 'Task ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `exam_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Exam name',
-  `wrong_question_mode` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether wrong-question reinforcement is enabled',
-  `single_choice_count` int NOT NULL DEFAULT 0 COMMENT 'Single choice count',
-  `multiple_choice_count` int NOT NULL DEFAULT 0 COMMENT 'Multiple choice count',
-  `judge_count` int NOT NULL DEFAULT 0 COMMENT 'Judge count',
-  `essay_count` int NOT NULL DEFAULT 0 COMMENT 'Essay count',
-  `total_question_count` int NOT NULL DEFAULT 0 COMMENT 'Total question count',
-  `exam_status` tinyint NOT NULL DEFAULT 0 COMMENT 'Exam status, enum: AiLearningExamStatusEnum',
-  `score` decimal(5,2) NULL DEFAULT NULL COMMENT 'Final score',
-  `objective_score` decimal(5,2) NULL DEFAULT NULL COMMENT 'Objective score',
-  `subjective_score` decimal(5,2) NULL DEFAULT NULL COMMENT 'Subjective score',
-  `average_correct_rate` decimal(5,2) NULL DEFAULT NULL COMMENT 'Average correct rate',
-  `weak_points` json NULL COMMENT 'Weak points JSON',
-  `started_time` datetime NULL DEFAULT NULL COMMENT 'Start time',
-  `submitted_time` datetime NULL DEFAULT NULL COMMENT 'Submit time',
-  `graded_time` datetime NULL DEFAULT NULL COMMENT 'Grade time',
-  `duration_minutes` int NOT NULL DEFAULT 0 COMMENT 'Duration minutes',
-  `error_message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Error message',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'AI 考试编号',
+  `plan_id` bigint NOT NULL COMMENT '学习计划编号',
+  `phase_id` bigint NOT NULL COMMENT '学习阶段编号',
+  `task_id` bigint NULL DEFAULT NULL COMMENT '学习任务编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `exam_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '考试名称',
+  `wrong_question_mode` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否开启历史错题强化考核',
+  `single_choice_count` int NOT NULL DEFAULT 0 COMMENT '单选题数量',
+  `multiple_choice_count` int NOT NULL DEFAULT 0 COMMENT '多选题数量',
+  `judge_count` int NOT NULL DEFAULT 0 COMMENT '判断题数量',
+  `essay_count` int NOT NULL DEFAULT 0 COMMENT '问答题数量',
+  `total_question_count` int NOT NULL DEFAULT 0 COMMENT '题目总数',
+  `exam_status` tinyint NOT NULL DEFAULT 0 COMMENT '考试状态，见 AiLearningExamStatusEnum',
+  `score` decimal(5,2) NULL DEFAULT NULL COMMENT '总分',
+  `objective_score` decimal(5,2) NULL DEFAULT NULL COMMENT '客观题得分',
+  `subjective_score` decimal(5,2) NULL DEFAULT NULL COMMENT '主观题得分',
+  `average_correct_rate` decimal(5,2) NULL DEFAULT NULL COMMENT '平均正确率',
+  `weak_points` json NULL COMMENT '薄弱知识点 JSON',
+  `started_time` datetime NULL DEFAULT NULL COMMENT '开始答题时间',
+  `submitted_time` datetime NULL DEFAULT NULL COMMENT '提交答卷时间',
+  `graded_time` datetime NULL DEFAULT NULL COMMENT '评分完成时间',
+  `duration_minutes` int NOT NULL DEFAULT 0 COMMENT '考试时长（分钟）',
+  `error_message` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '异常错误信息',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_ai_learning_exam_user_status` (`user_id`, `exam_status`) USING BTREE,
   KEY `idx_ai_learning_exam_plan_phase` (`plan_id`, `phase_id`) USING BTREE,
   KEY `idx_ai_learning_exam_task_id` (`task_id`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning exam';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 学习考试表';
 
 -- ----------------------------
--- Table structure for ai_learning_exam_question
+-- 表结构：ai_learning_exam_question
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_exam_question`;
 CREATE TABLE `ai_learning_exam_question` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Exam question ID',
-  `exam_id` bigint NOT NULL COMMENT 'Exam ID',
-  `plan_id` bigint NOT NULL COMMENT 'Plan ID',
-  `phase_id` bigint NULL DEFAULT NULL COMMENT 'Phase ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `question_no` int NOT NULL DEFAULT 1 COMMENT 'Question number',
-  `question_type` tinyint NOT NULL DEFAULT 0 COMMENT 'Question type, enum: AiLearningQuestionTypeEnum',
-  `stem` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Question stem',
-  `options_json` json NULL COMMENT 'Options JSON',
-  `correct_answer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Correct answer',
-  `answer_analysis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Answer analysis',
-  `knowledge_points` json NULL COMMENT 'Knowledge points JSON',
-  `user_answer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'User answer',
-  `is_correct` tinyint(1) NULL DEFAULT NULL COMMENT 'Whether answer is correct',
-  `score` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Question score',
-  `earned_score` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Earned score',
-  `wrong_tag` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether tagged as wrong question',
-  `needs_review` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Whether review is needed',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '考试题目编号',
+  `exam_id` bigint NOT NULL COMMENT 'AI 考试编号',
+  `plan_id` bigint NOT NULL COMMENT '学习计划编号',
+  `phase_id` bigint NOT NULL COMMENT '学习阶段编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `question_no` int NOT NULL DEFAULT 1 COMMENT '题目序号',
+  `question_type` tinyint NOT NULL DEFAULT 0 COMMENT '题目类型，见 AiLearningQuestionTypeEnum',
+  `stem` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '题干内容',
+  `options_json` json NULL COMMENT '选项内容 JSON',
+  `correct_answer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '标准答案',
+  `answer_analysis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '答案解析',
+  `knowledge_points` json NULL COMMENT '关联知识点 JSON',
+  `user_answer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '用户作答内容',
+  `is_correct` tinyint(1) NULL DEFAULT NULL COMMENT '是否答对',
+  `score` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '题目分值',
+  `earned_score` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT '实际得分',
+  `wrong_tag` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否标记为错题',
+  `needs_review` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否需要复习',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_ai_learning_exam_question_exam_no` (`exam_id`, `question_no`) USING BTREE,
   KEY `idx_ai_learning_exam_question_user_correct` (`user_id`, `is_correct`) USING BTREE,
   KEY `idx_ai_learning_exam_question_review` (`needs_review`, `wrong_tag`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning exam question';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 考试题目表';
 
 -- ----------------------------
--- Table structure for ai_learning_review_item
+-- 表结构：ai_learning_review_item
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_review_item`;
 CREATE TABLE `ai_learning_review_item` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Review item ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `plan_id` bigint NOT NULL COMMENT 'Plan ID',
-  `phase_id` bigint NULL DEFAULT NULL COMMENT 'Phase ID',
-  `task_id` bigint NULL DEFAULT NULL COMMENT 'Task ID',
-  `exam_id` bigint NULL DEFAULT NULL COMMENT 'Exam ID',
-  `question_id` bigint NULL DEFAULT NULL COMMENT 'Exam question ID',
-  `source_type` tinyint NOT NULL DEFAULT 0 COMMENT 'Review source type, enum: AiLearningTaskTypeEnum',
-  `content_title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Review title',
-  `review_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Review content',
-  `review_status` tinyint NOT NULL DEFAULT 0 COMMENT 'Review status, enum: AiLearningReviewStatusEnum',
-  `review_count` int NOT NULL DEFAULT 0 COMMENT 'Review count',
-  `ease_factor` decimal(4,2) NOT NULL DEFAULT 2.50 COMMENT 'Spaced repetition ease factor',
-  `interval_days` int NOT NULL DEFAULT 0 COMMENT 'Review interval days',
-  `next_review_time` datetime NULL DEFAULT NULL COMMENT 'Next review time',
-  `last_review_time` datetime NULL DEFAULT NULL COMMENT 'Last review time',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '复习项编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `plan_id` bigint NOT NULL COMMENT '学习计划编号',
+  `phase_id` bigint NULL DEFAULT NULL COMMENT '学习阶段编号',
+  `task_id` bigint NULL DEFAULT NULL COMMENT '学习任务编号',
+  `exam_id` bigint NULL DEFAULT NULL COMMENT 'AI 考试编号',
+  `question_id` bigint NULL DEFAULT NULL COMMENT '考试题目编号',
+  `source_type` tinyint NOT NULL DEFAULT 0 COMMENT '复习来源类型，见 AiLearningTaskTypeEnum',
+  `content_title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '复习内容标题',
+  `review_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '复习内容',
+  `review_status` tinyint NOT NULL DEFAULT 0 COMMENT '复习状态，见 AiLearningReviewStatusEnum',
+  `review_count` int NOT NULL DEFAULT 0 COMMENT '累计复习次数',
+  `ease_factor` decimal(4,2) NOT NULL DEFAULT 2.50 COMMENT '间隔重复难度系数',
+  `interval_days` int NOT NULL DEFAULT 0 COMMENT '复习间隔天数',
+  `next_review_time` datetime NULL DEFAULT NULL COMMENT '下次复习时间',
+  `last_review_time` datetime NULL DEFAULT NULL COMMENT '最近复习时间',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_ai_learning_review_user_status_next` (`user_id`, `review_status`, `next_review_time`) USING BTREE,
   KEY `idx_ai_learning_review_plan_phase` (`plan_id`, `phase_id`) USING BTREE,
   KEY `idx_ai_learning_review_question_id` (`question_id`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning review item';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 学习复习项表';
 
 -- ----------------------------
--- Table structure for ai_learning_profile_snapshot
+-- 表结构：ai_learning_profile_snapshot
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_profile_snapshot`;
 CREATE TABLE `ai_learning_profile_snapshot` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Profile snapshot ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `plan_id` bigint NULL DEFAULT NULL COMMENT 'Plan ID',
-  `snapshot_type` tinyint NOT NULL DEFAULT 0 COMMENT 'Snapshot type, enum: AiLearningProfileSnapshotTypeEnum',
-  `snapshot_date` date NOT NULL COMMENT 'Snapshot date',
-  `strengths` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Strength summary',
-  `weaknesses` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Weakness summary',
-  `habits` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Habit summary',
-  `memory_points` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Long-term memory points',
-  `ai_summary` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'AI generated summary',
-  `metrics_json` json NULL COMMENT 'Metrics JSON',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '画像快照编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `plan_id` bigint NULL DEFAULT NULL COMMENT '学习计划编号',
+  `snapshot_type` tinyint NOT NULL DEFAULT 0 COMMENT '快照类型，见 AiLearningProfileSnapshotTypeEnum',
+  `snapshot_date` date NOT NULL COMMENT '快照日期',
+  `strengths` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '优势总结',
+  `weaknesses` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '薄弱点总结',
+  `habits` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '学习习惯总结',
+  `memory_points` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '长期记忆要点',
+  `ai_summary` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'AI 生成总结',
+  `metrics_json` json NULL COMMENT '分析指标 JSON',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `idx_ai_learning_profile_user_type_date` (`user_id`, `snapshot_type`, `snapshot_date`) USING BTREE,
   KEY `idx_ai_learning_profile_plan_id` (`plan_id`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning profile snapshot';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 学习画像快照表';
 
 -- ----------------------------
--- Table structure for ai_learning_badge_record
+-- 表结构：ai_learning_badge_record
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_learning_badge_record`;
 CREATE TABLE `ai_learning_badge_record` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Badge record ID',
-  `user_id` bigint NOT NULL COMMENT 'Admin user ID',
-  `plan_id` bigint NULL DEFAULT NULL COMMENT 'Plan ID',
-  `badge_type` tinyint NOT NULL DEFAULT 0 COMMENT 'Badge type, enum: AiLearningBadgeTypeEnum',
-  `badge_status` tinyint NOT NULL DEFAULT 0 COMMENT 'Badge status, enum: AiLearningBadgeStatusEnum',
-  `progress_value` decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'Current progress value',
-  `progress_target` decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT 'Target progress value',
-  `unlocked_time` datetime NULL DEFAULT NULL COMMENT 'Unlocked time',
-  `remark` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Badge remark',
-  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Creator',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
-  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT 'Updater',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Deleted flag',
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '勋章记录编号',
+  `user_id` bigint NOT NULL COMMENT '管理员用户编号',
+  `plan_id` bigint NULL DEFAULT NULL COMMENT '学习计划编号',
+  `badge_type` tinyint NOT NULL DEFAULT 0 COMMENT '勋章类型，见 AiLearningBadgeTypeEnum',
+  `badge_status` tinyint NOT NULL DEFAULT 0 COMMENT '勋章状态，见 AiLearningBadgeStatusEnum',
+  `progress_value` decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT '当前进度值',
+  `progress_target` decimal(8,2) NOT NULL DEFAULT 0.00 COMMENT '目标进度值',
+  `unlocked_time` datetime NULL DEFAULT NULL COMMENT '解锁时间',
+  `remark` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '勋章备注',
+  `creator` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_ai_learning_badge_user_type` (`user_id`, `badge_type`) USING BTREE,
   KEY `idx_ai_learning_badge_status` (`badge_status`) USING BTREE,
   KEY `idx_ai_learning_badge_plan_id` (`plan_id`) USING BTREE
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI learning badge record';
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI 学习勋章记录表';
 
 SET FOREIGN_KEY_CHECKS = 1;
