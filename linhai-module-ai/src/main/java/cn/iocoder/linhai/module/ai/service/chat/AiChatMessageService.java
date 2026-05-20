@@ -6,6 +6,7 @@ import cn.iocoder.linhai.module.ai.controller.admin.chat.vo.message.AiChatMessag
 import cn.iocoder.linhai.module.ai.controller.admin.chat.vo.message.AiChatMessageSendReqVO;
 import cn.iocoder.linhai.module.ai.controller.admin.chat.vo.message.AiChatMessageSendRespVO;
 import cn.iocoder.linhai.module.ai.dal.dataobject.chat.AiChatMessageDO;
+import com.alibaba.dashscope.app.ApplicationOutput;
 import reactor.core.publisher.Flux;
 
 import java.util.Collection;
@@ -84,4 +85,11 @@ public interface AiChatMessageService {
      */
     PageResult<AiChatMessageDO> getChatMessagePage(AiChatMessagePageReqVO pageReqVO);
 
+    /**
+     * 根据提示词生成对应的数据
+     *
+     * @param prompt 提示词
+     * @return 生成的数据
+     */
+    ApplicationOutput ollamaAgentGenerate(String prompt);
 }

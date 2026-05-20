@@ -35,6 +35,7 @@ import cn.iocoder.linhai.module.ai.service.model.AiModelService;
 import cn.iocoder.linhai.module.ai.service.model.AiToolService;
 import cn.iocoder.linhai.module.ai.util.AiUtils;
 import cn.iocoder.linhai.module.ai.util.FileTypeUtils;
+import com.alibaba.dashscope.app.ApplicationOutput;
 import com.google.common.collect.Maps;
 import io.modelcontextprotocol.client.McpSyncClient;
 import jakarta.annotation.Resource;
@@ -137,6 +138,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     @Resource
     private ToolCallbackResolver toolCallbackResolver;
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public AiChatMessageSendRespVO sendMessage(AiChatMessageSendReqVO sendReqVO, Long userId) {
         // 1.1 校验对话存在
@@ -565,6 +567,11 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
     @Override
     public PageResult<AiChatMessageDO> getChatMessagePage(AiChatMessagePageReqVO pageReqVO) {
         return chatMessageMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public ApplicationOutput ollamaAgentGenerate(String prompt) {
+        return ollamaAgentService.generate(prompt);
     }
 
 }
