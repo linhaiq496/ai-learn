@@ -3,7 +3,7 @@ package cn.iocoder.linhai.module.ai.controller.admin.knowledge.vo.segment;
 import cn.iocoder.linhai.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.linhai.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 

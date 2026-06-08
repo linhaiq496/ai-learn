@@ -18,7 +18,7 @@ import cn.iocoder.linhai.module.ai.enums.music.AiMusicGenerateModeEnum;
 import cn.iocoder.linhai.module.ai.enums.music.AiMusicStatusEnum;
 import cn.iocoder.linhai.module.ai.service.model.AiModelService;
 import cn.iocoder.linhai.module.infra.api.file.FileApi;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

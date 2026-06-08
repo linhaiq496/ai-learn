@@ -1,7 +1,7 @@
 package cn.iocoder.linhai.module.ai.controller.admin.model.vo.chatRole;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 

@@ -12,7 +12,7 @@ import cn.iocoder.linhai.module.ai.controller.admin.model.vo.chatRole.AiChatRole
 import cn.iocoder.linhai.module.ai.dal.dataobject.model.AiChatRoleDO;
 import cn.iocoder.linhai.module.ai.dal.mysql.model.AiChatRoleMapper;
 import cn.iocoder.linhai.module.ai.service.knowledge.AiKnowledgeService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

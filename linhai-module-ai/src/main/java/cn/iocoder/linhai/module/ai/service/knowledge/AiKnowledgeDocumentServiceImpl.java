@@ -14,7 +14,7 @@ import cn.iocoder.linhai.module.ai.controller.admin.knowledge.vo.document.AiKnow
 import cn.iocoder.linhai.module.ai.controller.admin.knowledge.vo.knowledge.AiKnowledgeDocumentCreateReqVO;
 import cn.iocoder.linhai.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentDO;
 import cn.iocoder.linhai.module.ai.dal.mysql.knowledge.AiKnowledgeDocumentMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;

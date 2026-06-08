@@ -17,7 +17,7 @@ import com.agentsflex.llm.ollama.OllamaLlmConfig;
 import com.agentsflex.llm.qwen.QwenLlm;
 import com.agentsflex.llm.qwen.QwenLlmConfig;
 import dev.tinyflow.core.Tinyflow;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;

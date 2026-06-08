@@ -5,7 +5,7 @@ import cn.iocoder.linhai.module.ai.controller.admin.model.vo.chatRole.AiChatRole
 import cn.iocoder.linhai.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveMyReqVO;
 import cn.iocoder.linhai.module.ai.controller.admin.model.vo.chatRole.AiChatRoleSaveReqVO;
 import cn.iocoder.linhai.module.ai.dal.dataobject.model.AiChatRoleDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;

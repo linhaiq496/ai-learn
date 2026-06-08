@@ -58,11 +58,12 @@ public class AiLearningAnalysisServiceImpl implements AiLearningAnalysisService 
         if (avgScore == null) {
             avgScore = BigDecimal.ZERO;
         }
+        BigDecimal finalAvgScore = avgScore;
         return BeanUtils.toBean(plan, AiLearningDashboardRespVO.class, bean -> {
             bean.setPlanId(planId);
             bean.setCompletedPhaseCount((int) completedPhaseCount);
             bean.setTotalExamCount(exams.size());
-            bean.setAverageScore(avgScore);
+            bean.setAverageScore(finalAvgScore);
             bean.setHighestScore(maxScore);
         });
     }

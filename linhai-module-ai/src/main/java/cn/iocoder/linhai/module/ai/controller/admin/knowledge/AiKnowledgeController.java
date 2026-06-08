@@ -12,8 +12,8 @@ import cn.iocoder.linhai.module.ai.service.knowledge.AiKnowledgeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +63,7 @@ public class AiKnowledgeController {
         knowledgeService.updateKnowledge(updateReqVO);
         return success(true);
     }
-    
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除知识库")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")

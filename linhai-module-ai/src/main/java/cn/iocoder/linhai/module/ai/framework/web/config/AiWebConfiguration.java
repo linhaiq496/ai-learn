@@ -1,7 +1,7 @@
 package cn.iocoder.linhai.module.ai.framework.web.config;
 
 import cn.iocoder.linhai.framework.swagger.config.LinhaiSwaggerAutoConfiguration;
-import org.springdoc.core.models.GroupedOpenApi;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

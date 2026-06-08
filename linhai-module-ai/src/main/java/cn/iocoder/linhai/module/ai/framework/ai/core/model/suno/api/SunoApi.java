@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -29,13 +28,13 @@ public class SunoApi {
 
     private final WebClient webClient;
 
-    private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
+    private final Predicate<HttpStatus> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
 
     private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
             reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {
-                HttpRequest request = response.request();
+                HttpStatus status = response.statusCode();
                 log.error("[suno-api] 调用失败！请求方式:[{}]，请求地址:[{}]，请求参数:[{}]，响应数据: [{}]",
-                        request.getMethod(), request.getURI(), reqParam, responseBody);
+                        status, "", reqParam, responseBody);
                 sink.error(new IllegalStateException("[suno-api] 调用失败！"));
             });
 

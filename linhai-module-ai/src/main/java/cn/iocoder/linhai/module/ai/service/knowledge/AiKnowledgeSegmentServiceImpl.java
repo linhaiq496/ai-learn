@@ -26,7 +26,7 @@ import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
 import com.alibaba.cloud.ai.model.RerankRequest;
 import com.alibaba.cloud.ai.model.RerankResponse;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tokenizer.TokenCountEstimator;

@@ -4,7 +4,7 @@ import cn.iocoder.linhai.framework.common.pojo.PageResult;
 import cn.iocoder.linhai.module.ai.controller.admin.model.vo.apikey.AiApiKeyPageReqVO;
 import cn.iocoder.linhai.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.linhai.module.ai.dal.dataobject.model.AiApiKeyDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.List;
 

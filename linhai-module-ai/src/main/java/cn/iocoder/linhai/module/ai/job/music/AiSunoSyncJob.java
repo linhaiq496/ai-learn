@@ -2,7 +2,7 @@ package cn.iocoder.linhai.module.ai.job.music;
 
 import cn.iocoder.linhai.framework.quartz.core.handler.JobHandler;
 import cn.iocoder.linhai.module.ai.service.music.AiMusicService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

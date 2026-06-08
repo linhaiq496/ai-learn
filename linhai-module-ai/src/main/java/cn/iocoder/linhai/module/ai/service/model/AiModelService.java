@@ -7,7 +7,7 @@ import cn.iocoder.linhai.module.ai.controller.admin.model.vo.model.AiModelPageRe
 import cn.iocoder.linhai.module.ai.controller.admin.model.vo.model.AiModelSaveReqVO;
 import cn.iocoder.linhai.module.ai.dal.dataobject.model.AiModelDO;
 import dev.tinyflow.core.Tinyflow;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.vectorstore.VectorStore;

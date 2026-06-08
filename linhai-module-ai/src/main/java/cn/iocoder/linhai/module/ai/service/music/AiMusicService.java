@@ -3,7 +3,7 @@ package cn.iocoder.linhai.module.ai.service.music;
 import cn.iocoder.linhai.framework.common.pojo.PageResult;
 import cn.iocoder.linhai.module.ai.controller.admin.music.vo.*;
 import cn.iocoder.linhai.module.ai.dal.dataobject.music.AiMusicDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 import java.util.List;
 

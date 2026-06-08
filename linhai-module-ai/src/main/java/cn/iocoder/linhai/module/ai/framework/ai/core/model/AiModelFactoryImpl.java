@@ -37,6 +37,7 @@ import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import io.micrometer.observation.ObservationRegistry;
 import io.milvus.client.MilvusServiceClient;
+import io.milvus.param.ConnectParam;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import lombok.SneakyThrows;
@@ -102,7 +103,6 @@ import org.springframework.ai.stabilityai.api.StabilityAiApi;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
-import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusServiceClientConnectionDetails;
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusServiceClientProperties;
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration;
 import org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreProperties;
@@ -120,7 +120,6 @@ import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.web.client.RestClient;
 import redis.clients.jedis.JedisPooled;
 
 import java.io.File;
@@ -129,6 +128,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static cn.iocoder.linhai.framework.common.util.collection.CollectionUtils.convertList;
 import static org.springframework.ai.retry.RetryUtils.DEFAULT_RETRY_TEMPLATE;
@@ -451,8 +452,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
      * 可参考 {@link ZhiPuAiImageAutoConfiguration} 的 zhiPuAiImageModel 方法
      */
     private ZhiPuAiImageModel buildZhiPuAiImageModel(String apiKey, String url) {
-        ZhiPuAiImageApi zhiPuAiApi = StrUtil.isEmpty(url) ? new ZhiPuAiImageApi(apiKey)
-                : new ZhiPuAiImageApi(url, apiKey, RestClient.builder());
+        ZhiPuAiImageApi zhiPuAiApi = new ZhiPuAiImageApi(apiKey);
         return new ZhiPuAiImageModel(zhiPuAiApi);
     }
 
@@ -777,21 +777,42 @@ public class AiModelFactoryImpl implements AiModelFactory {
         MilvusServiceClientProperties clientProperties = SpringUtil.getBean(MilvusServiceClientProperties.class);
 
         // 创建 MilvusServiceClient 对象
-        MilvusServiceClient milvusClient = configuration.milvusClient(serverProperties, clientProperties,
-                new MilvusServiceClientConnectionDetails() {
-
-                    @Override
-                    public String getHost() {
-                        return clientProperties.getHost();
-                    }
-
-                    @Override
-                    public int getPort() {
-                        return clientProperties.getPort();
-                    }
-
-                }
-        );
+        ConnectParam.Builder connectParamBuilder = ConnectParam.newBuilder()
+                .withDatabaseName(serverProperties.getDatabaseName())
+                .withConnectTimeout(clientProperties.getConnectTimeoutMs(), TimeUnit.MILLISECONDS)
+                .withKeepAliveTime(clientProperties.getKeepAliveTimeMs(), TimeUnit.MILLISECONDS)
+                .withKeepAliveTimeout(clientProperties.getKeepAliveTimeoutMs(), TimeUnit.MILLISECONDS)
+                .withRpcDeadline(clientProperties.getRpcDeadlineMs(), TimeUnit.MILLISECONDS)
+                .withIdleTimeout(clientProperties.getIdleTimeoutMs(), TimeUnit.MILLISECONDS)
+                .withSecure(clientProperties.isSecure());
+        if (StrUtil.isNotBlank(clientProperties.getUri())) {
+            connectParamBuilder.withUri(clientProperties.getUri());
+        } else {
+            connectParamBuilder.withHost(clientProperties.getHost())
+                    .withPort(clientProperties.getPort());
+        }
+        if (StrUtil.isNotBlank(clientProperties.getToken())) {
+            connectParamBuilder.withToken(clientProperties.getToken());
+        } else if (StrUtil.isNotBlank(clientProperties.getUsername())
+                && StrUtil.isNotBlank(clientProperties.getPassword())) {
+            connectParamBuilder.withAuthorization(clientProperties.getUsername(), clientProperties.getPassword());
+        }
+        if (StrUtil.isNotBlank(clientProperties.getClientKeyPath())) {
+            connectParamBuilder.withClientKeyPath(clientProperties.getClientKeyPath());
+        }
+        if (StrUtil.isNotBlank(clientProperties.getClientPemPath())) {
+            connectParamBuilder.withClientPemPath(clientProperties.getClientPemPath());
+        }
+        if (StrUtil.isNotBlank(clientProperties.getCaPemPath())) {
+            connectParamBuilder.withCaPemPath(clientProperties.getCaPemPath());
+        }
+        if (StrUtil.isNotBlank(clientProperties.getServerPemPath())) {
+            connectParamBuilder.withServerPemPath(clientProperties.getServerPemPath());
+        }
+        if (StrUtil.isNotBlank(clientProperties.getServerName())) {
+            connectParamBuilder.withServerName(clientProperties.getServerName());
+        }
+        MilvusServiceClient milvusClient = new MilvusServiceClient(connectParamBuilder.build());
         // 创建 MilvusVectorStore 对象
         MilvusVectorStore vectorStore = configuration.vectorStore(milvusClient, embeddingModel, serverProperties,
                 getBatchingStrategy(), getObservationRegistry(), getCustomObservationConvention());
@@ -802,25 +823,11 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     private static ObjectProvider<ObservationRegistry> getObservationRegistry() {
-        return new ObjectProvider<>() {
-
-            @Override
-            public ObservationRegistry getObject() throws BeansException {
-                return SpringUtil.getBean(ObservationRegistry.class);
-            }
-
-        };
+        return singletonProvider(() -> SpringUtil.getBean(ObservationRegistry.class));
     }
 
     private static ObjectProvider<VectorStoreObservationConvention> getCustomObservationConvention() {
-        return new ObjectProvider<>() {
-
-            @Override
-            public VectorStoreObservationConvention getObject() throws BeansException {
-                return new DefaultVectorStoreObservationConvention();
-            }
-
-        };
+        return singletonProvider(DefaultVectorStoreObservationConvention::new);
     }
 
     private static BatchingStrategy getBatchingStrategy() {
@@ -832,11 +839,30 @@ public class AiModelFactoryImpl implements AiModelFactory {
     }
 
     private static ObjectProvider<EmbeddingModelObservationConvention> getEmbeddingModelObservationConvention() {
+        return singletonProvider(() -> SpringUtil.getBean(EmbeddingModelObservationConvention.class));
+    }
+
+    private static <T> ObjectProvider<T> singletonProvider(Supplier<T> supplier) {
         return new ObjectProvider<>() {
 
             @Override
-            public EmbeddingModelObservationConvention getObject() throws BeansException {
-                return SpringUtil.getBean(EmbeddingModelObservationConvention.class);
+            public T getObject(Object... args) throws BeansException {
+                return supplier.get();
+            }
+
+            @Override
+            public T getObject() throws BeansException {
+                return supplier.get();
+            }
+
+            @Override
+            public T getIfAvailable() throws BeansException {
+                return supplier.get();
+            }
+
+            @Override
+            public T getIfUnique() throws BeansException {
+                return supplier.get();
             }
 
         };

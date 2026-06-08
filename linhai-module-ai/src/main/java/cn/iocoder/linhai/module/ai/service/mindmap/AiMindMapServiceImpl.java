@@ -20,7 +20,7 @@ import cn.iocoder.linhai.module.ai.enums.AiChatRoleEnum;
 import cn.iocoder.linhai.module.ai.enums.ErrorCodeConstants;
 import cn.iocoder.linhai.module.ai.service.model.AiChatRoleService;
 import cn.iocoder.linhai.module.ai.service.model.AiModelService;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;

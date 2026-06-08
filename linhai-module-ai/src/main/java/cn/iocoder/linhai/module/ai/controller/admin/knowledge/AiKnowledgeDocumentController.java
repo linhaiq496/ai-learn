@@ -9,8 +9,8 @@ import cn.iocoder.linhai.module.ai.dal.dataobject.knowledge.AiKnowledgeDocumentD
 import cn.iocoder.linhai.module.ai.service.knowledge.AiKnowledgeDocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import javax.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

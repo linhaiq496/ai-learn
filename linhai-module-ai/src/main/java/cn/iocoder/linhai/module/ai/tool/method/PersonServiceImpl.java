@@ -1,6 +1,6 @@
 package cn.iocoder.linhai.module.ai.tool.method;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;

@@ -27,7 +27,7 @@ import cn.iocoder.linhai.module.ai.framework.ai.core.model.siliconflow.SiliconFl
 import cn.iocoder.linhai.module.ai.service.model.AiModelService;
 import cn.iocoder.linhai.module.infra.api.file.FileApi;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageOptions;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springaicommunity.qianfan.QianFanImageOptions;
 import org.springframework.ai.image.ImageModel;

@@ -3,7 +3,7 @@ package cn.iocoder.linhai.module.ai.controller.admin.write.vo;
 import cn.iocoder.linhai.framework.common.validation.InEnum;
 import cn.iocoder.linhai.module.ai.enums.write.AiWriteTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 写作生成 Request VO")

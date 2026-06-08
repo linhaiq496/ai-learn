@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -44,7 +44,7 @@ public class XunFeiPptApi {
     private final String appId;
     private final String apiSecret;
 
-    private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
+    private final Predicate<HttpStatus> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
 
     private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
             reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {

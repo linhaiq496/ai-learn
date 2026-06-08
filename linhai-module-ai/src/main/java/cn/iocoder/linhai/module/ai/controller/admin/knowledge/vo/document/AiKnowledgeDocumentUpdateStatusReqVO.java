@@ -3,7 +3,7 @@ package cn.iocoder.linhai.module.ai.controller.admin.knowledge.vo.document;
 import cn.iocoder.linhai.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.linhai.framework.common.validation.InEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Schema(description = "管理后台 - AI 知识库文档更新状态 Request VO")

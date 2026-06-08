@@ -9,7 +9,7 @@ import cn.iocoder.linhai.module.ai.framework.ai.core.webserch.AiWebSearchRespons
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -37,7 +37,7 @@ public class AiBoChaWebSearchClient implements AiWebSearchClient {
 
     private final WebClient webClient;
 
-    private final Predicate<HttpStatusCode> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
+    private final Predicate<HttpStatus> STATUS_PREDICATE = status -> !status.is2xxSuccessful();
 
     private final Function<Object, Function<ClientResponse, Mono<? extends Throwable>>> EXCEPTION_FUNCTION =
             reqParam -> response -> response.bodyToMono(String.class).handle((responseBody, sink) -> {

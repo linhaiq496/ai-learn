@@ -5,7 +5,7 @@ import cn.iocoder.linhai.module.ai.controller.admin.workflow.vo.AiWorkflowPageRe
 import cn.iocoder.linhai.module.ai.controller.admin.workflow.vo.AiWorkflowSaveReqVO;
 import cn.iocoder.linhai.module.ai.controller.admin.workflow.vo.AiWorkflowTestReqVO;
 import cn.iocoder.linhai.module.ai.dal.dataobject.workflow.AiWorkflowDO;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 /**
  * AI 工作流 Service 接口

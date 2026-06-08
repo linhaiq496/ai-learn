@@ -38,7 +38,7 @@ import cn.iocoder.linhai.module.ai.util.FileTypeUtils;
 import com.alibaba.dashscope.app.ApplicationOutput;
 import com.google.common.collect.Maps;
 import io.modelcontextprotocol.client.McpSyncClient;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
@@ -571,7 +571,7 @@ public class AiChatMessageServiceImpl implements AiChatMessageService {
 
     @Override
     public ApplicationOutput ollamaAgentGenerate(String prompt) {
-        return ollamaAgentService.generate(prompt);
+        throw new UnsupportedOperationException("ollamaAgentGenerate is not configured");
     }
 
 }

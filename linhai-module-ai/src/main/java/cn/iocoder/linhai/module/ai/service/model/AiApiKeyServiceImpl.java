@@ -7,7 +7,7 @@ import cn.iocoder.linhai.module.ai.controller.admin.model.vo.apikey.AiApiKeyPage
 import cn.iocoder.linhai.module.ai.controller.admin.model.vo.apikey.AiApiKeySaveReqVO;
 import cn.iocoder.linhai.module.ai.dal.dataobject.model.AiApiKeyDO;
 import cn.iocoder.linhai.module.ai.dal.mysql.model.AiApiKeyMapper;
-import jakarta.annotation.Resource;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
